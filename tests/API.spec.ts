@@ -3,7 +3,10 @@ import {test} from '../fixtures/fixtures';
 import testdata from '../test-data/testdata.json';
 
 const loginPayload={userEmail: "rafi.tgcs219@gmail.com", userPassword: "MBxanptFWYri5$k"};
+const createOrderPayLoad={orders: [{country: "Argentina", productOrderedId: "6960eae1c941646b7a8b3ed3"}]};
+const fakePayLoad={"data":[],"message":"No Orders"};
 let token:any;
+let orderId:any;
 test.beforeAll(async ()=>{
 
     const apiContext=await request.newContext();
@@ -11,6 +14,22 @@ test.beforeAll(async ()=>{
     const apiResJson=await apiRes.json();
     token=await apiResJson.token;
     console.log(token);
+
+    //create order
+    const apiContext2=await request.newContext();
+    const aipRes2=await apiContext2.post("https://rahulshettyacademy.com/api/ecom/order/create-order",{
+
+        data:createOrderPayLoad,
+        headers:{
+             authorization : token,
+            'Content-Type':'application/json',
+        }
+    });
+
+    const apiResJson2=await aipRes2.json();
+    const orderId=await apiResJson2.orders[0];
+    console.log(orderId);
+
 });
 
 test("API Testing", async ({page,loginPage})=>{
@@ -25,6 +44,17 @@ test("API Testing", async ({page,loginPage})=>{
 
     await expect(page).toHaveTitle("Let's Shop");
 
-   
+    await page.route("https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/6a48b09085b8849b49c88b7f",async route=>{
 
+        const body=JSON.stringify(fakePayLoad);
+
+        await route.fulfill({
+            body,
+        });
+    });
+
+    
+
+   await page.getByRole("button",{name:'  ORDERS'}).click();
+   
 });
