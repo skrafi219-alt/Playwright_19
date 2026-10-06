@@ -9,6 +9,6 @@ test("login functionality", async ({page,loginPage})=>{
     await loginPage.login(testdata.username,testdata.password);
 
     await expect(page).toHaveTitle("Let's Shop");
-    await page.pause();
+    
 
 });
